@@ -22,7 +22,7 @@ const GridExample = () => {
   // const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
   const gridRef = useRef<AgGridReact>(null);
 
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+  const [columnDefs] = useState<ColDef[]>([
     // this row shows the row index, doesn't use any data from the row
     {
       headerName: "ID",
@@ -118,8 +118,20 @@ const GridExample = () => {
             }, 500);
           },
         };
-        params.api.setDatasource(dataSource);
+
+        // update 10 rows every 500ms
+        const rowsThisPage = data.slice(0, 11);
+        params.api.setRowData(rowsThisPage);
+        let row = 0;
+        setInterval(() => {
+          console.log("Updating rows: ", row);
+          rowsThisPage[row % 11].athlete = `Updated #${row}`;
+          params.api.setRowData(rowsThisPage);
+          row += 1;
+        }, 500);
         params.api.setDomLayout("autoHeight");
+
+        // params.api.setDatasource(dataSource);
         // setRowDataSource(dataSource);
         // console.log(data);
         // setRowData(data);
@@ -161,11 +173,11 @@ const GridExample = () => {
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         rowBuffer={0}
-        rowModelType={"infinite"}
+        // rowModelType={"infinite"}
         cacheBlockSize={100}
         cacheOverflowSize={2}
         maxConcurrentDatasourceRequests={1}
-        infiniteInitialRowCount={1000}
+        // infiniteInitialRowCount={1000}
         maxBlocksInCache={10}
         onGridReady={onGridReady}
         frameworkComponents={CellRenderer}
